@@ -1,7 +1,7 @@
 from itertools import count
 from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, StringConstraints
 
 app = FastAPI()
@@ -21,12 +21,16 @@ class Category(BaseModel):
 
 
 categories: dict[int, Category] = {}  
+used_names = []
 ids = count(1)                        
 
 
-@app.post("/categories")
+@app.post("/categories", status_code=201)
 async def create_category(data: CategoryCreate) -> Category:
-    category = Category(id=next(ids), name=data.name)
+    if data.name.capitalize() in used_names:
+        raise HTTPException(409, detail='Категория с таким именем уже есть')
+    used_names.append(data.name.capitalize())
+    category = Category(id=next(ids), name=data.name.capitalize())
     categories[category.id] = category
     return category
 
@@ -39,14 +43,21 @@ async def list_categories() -> list[Category]:
 @app.get("/categories/{category_id}")
 async def get_category(category_id: int) -> Category:
     category = categories.get(category_id)
+    if not category:
+        raise HTTPException(404, detail="Категории не существует")
     return category
 
 
 @app.patch("/categories/{category_id}")
 async def rename_category(category_id: int, data: CategoryRename) -> Category:
-    if categories.get(category_id):
-        category = Category(id=category_id, name=data.name)
-        categories[category_id] = category
+    if not categories.get(category_id):
+        raise HTTPException(404, 'Категории не существует')
+    elif data.name.capitalize() in used_names:
+        raise HTTPException(409, 'Имя занято или использовано повторно')
+    used_names.remove(categories[category_id].name)
+    category = Category(id=category_id, name=data.name)
+    categories[category_id] = category
+    used_names.append(data.name.capitalize())
     return category
 
 
