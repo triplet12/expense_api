@@ -11,7 +11,7 @@ class CategoryCreate(BaseModel):
 
 
 class CategoryRename(BaseModel):
-    name: str
+    name: str 
 
 
 class Category(BaseModel):         
@@ -24,14 +24,14 @@ ids = count(1)
 
 
 @app.post("/categories")
-def create_category(data: CategoryCreate) -> Category:
+async def create_category(data: CategoryCreate) -> Category:
     category = Category(id=next(ids), name=data.name)
     categories[category.id] = category
     return category
 
 
 @app.get("/categories")
-def list_categories() -> list[Category]:
+async def list_categories() -> list[Category]:
     return list(categories.values())
 
 
@@ -47,3 +47,8 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
         category = Category(id=category_id, name=data.name)
         categories[category_id] = category
     return category
+
+
+@app.get("/health")
+async def alive():
+    return {"satus": "ok"}
