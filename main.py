@@ -1,17 +1,18 @@
 from itertools import count
+from typing import Annotated
 
 from fastapi import FastAPI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, StringConstraints
 
 app = FastAPI()
 
 
 class CategoryCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=50)
+    name: str = Annotated[str, StringConstraints(min_length=1, max_length=50)]
 
 
 class CategoryRename(BaseModel):
-    name: str = Field(min_length=1, max_length=50)
+    name: str = Annotated[str, StringConstraints(min_length=1, max_length=50)]
 
 
 class Category(BaseModel):         
@@ -51,4 +52,4 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
 
 @app.get("/health")
 async def alive():
-    return {"satus": "ok"}
+    return {"status": "ok"}
