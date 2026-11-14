@@ -7,11 +7,11 @@ app = FastAPI()
 
 
 class CategoryCreate(BaseModel):
-    name: str = Field(max_length=50)
+    name: str = Field(min_length=1, max_length=50)
 
 
 class CategoryRename(BaseModel):
-    name: str = Field(max_length=50)
+    name: str = Field(min_length=1, max_length=50)
 
 
 class Category(BaseModel):         
