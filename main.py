@@ -36,7 +36,7 @@ async def list_categories() -> list[Category]:
 
 
 @app.get("/categories/{category_id}")
-async def category_id(category_id: int) -> Category:
+async def get_category(category_id: int) -> Category:
     category = categories.get(category_id)
     return category
 
