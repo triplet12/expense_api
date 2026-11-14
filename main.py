@@ -1,17 +1,17 @@
 from itertools import count
 
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
 
 class CategoryCreate(BaseModel):
-    name: str
+    name: str = Field(max_length=50)
 
 
 class CategoryRename(BaseModel):
-    name: str 
+    name: str = Field(max_length=50)
 
 
 class Category(BaseModel):         
