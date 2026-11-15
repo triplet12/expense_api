@@ -42,7 +42,7 @@ class CreateExpense(BaseModel):
 
 class PatchExpense(BaseModel):
     amount: Annotated[Decimal, Field(gt=0, decimal_places=2)] = None
-    description: str = None
+    description: str | None = None
     category_id: int = None
     spent_at: date = None
 
@@ -60,7 +60,7 @@ def is_category_exist(id: int):
 
 def is_expense_exist(id: int):
     if id not in expenses:
-        raise HTTPException(404, detail="Тарты с таким ID нет")
+        raise HTTPException(404, detail="Траты с таким ID нет")
 
 
 @app.post("/categories", status_code=201)
@@ -134,7 +134,7 @@ async def update_expense_by_id(expense_id: int, expense: PatchExpense) -> Expens
     update_expense = expense.model_dump(exclude_unset=True)
     updated_expense = expenses[expense_id].model_copy(update=update_expense)
     if updated_expense.category_id not in categories:
-        raise HTTPException(404, detail="Такой категории нет")
+        raise HTTPException(422, detail="Такой категории нет")
     updated_expense.updated_at = datetime.now()
     expenses[expense_id] = updated_expense
     return updated_expense
