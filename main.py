@@ -42,9 +42,9 @@ class CreateExpense(BaseModel):
 
 class PatchExpense(BaseModel):
     amount: Annotated[Decimal, Field(gt=0, decimal_places=2)] = None
-    description: str | None = None
-    category_id: int | None = None
-    spent_at: date | None = None
+    description: str = None
+    category_id: int = None
+    spent_at: date = None
 
 
 categories: dict[int, Category] = {}  
@@ -131,8 +131,9 @@ async def del_expense(expense_id: int) -> None:
 @app.patch("/expenses/{expense_id}")
 async def update_expense_by_id(expense_id: int, expense: PatchExpense) -> Expense:
     is_expense_exist(expense_id)
+    update_expense = expense.model_dump(exclude_unset=True)
     updated_expense = expenses[expense_id].model_copy(update=update_expense)
-    if updated_expense.category_id not in expenses:
+    if updated_expense.category_id not in categories:
         raise HTTPException(404, detail="Такой категории нет")
     updated_expense.updated_at = datetime.now()
     expenses[expense_id] = updated_expense
