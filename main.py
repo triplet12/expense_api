@@ -58,6 +58,11 @@ def is_category_exist(id: int):
         raise HTTPException(404, 'Категории не существует') 
 
 
+def is_expense_exist(id: int):
+    if id not in expenses:
+        raise HTTPException(404, detail="Тарты с таким ID нет")
+
+
 @app.post("/categories", status_code=201)
 async def create_category(data: CategoryCreate) -> Category:
     name = data.name.capitalize()
@@ -113,23 +118,19 @@ async def show_expenses() -> list[Expense]:
 
 @app.get("/expenses/{expense_id}")
 async def show_expense_by_id(expense_id: int) -> Expense:
-    if expense_id not in expenses:
-        raise HTTPException(404, detail="Тарты с таким ID нет")
+    is_expense_exist(expense_id)
     return expenses[expense_id]
 
 
 @app.delete("/expenses/{expense_id}", status_code=204)
 async def del_expense(expense_id: int) -> None:
-    if expense_id not in expenses:
-        raise HTTPException(404, detail="Тарты с таким ID нет")
+    is_expense_exist(expense_id)
     del expenses[expense_id]
 
 
 @app.patch("/expenses/{expense_id}")
 async def update_expense_by_id(expense_id: int, expense: PatchExpense) -> Expense:
-    if expense_id not in expenses:
-        raise HTTPException(404, detail="Тарты с таким ID нет")
-    update_expense = expense.model_dump(exclude_unset=True)
+    is_expense_exist(expense_id)
     updated_expense = expenses[expense_id].model_copy(update=update_expense)
     if updated_expense.category_id not in expenses:
         raise HTTPException(404, detail="Такой категории нет")
