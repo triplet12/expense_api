@@ -61,6 +61,14 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
     return category
 
 
+@app.delete("/categories/{id}", status_code=204)
+async def del_category(id: int) -> None:
+    if not categories.get(id):
+        raise HTTPException(404, "Категории не существует")
+    used_names.remove(categories[id].name)
+    del categories[id]
+
+
 @app.get("/health")
 async def alive():
     return {"status": "ok"}
