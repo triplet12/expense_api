@@ -1,8 +1,11 @@
 from itertools import count
 from typing import Annotated
+from datetime import date, datetime
+from decimal import Decimal
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, StringConstraints, Field
+
 
 app = FastAPI()
 
@@ -20,8 +23,26 @@ class Category(BaseModel):
     name: str
 
 
+class Expense(BaseModel):
+    id: int
+    amount: Annotated[Decimal, Field(gt=0, decimal_places=2)]
+    description: str | None = None
+    category_id: int
+    spent_at: date
+    created_at: datetime
+
+
+class CreateExpense(BaseModel):
+    amount: Annotated[Decimal, Field(gt=0, decimal_places=2)]
+    description: str | None = None
+    category_id: int
+    spent_at: date
+
+
 categories: dict[int, Category] = {}  
-ids = count(1)                        
+expenses: dict[int, Expense] = {}
+ids = count(1)      
+id_expense = count(1)                  
 
 
 def is_category_exist(id: int):
@@ -68,6 +89,16 @@ async def del_category(category_id: int) -> None:
     del categories[category_id]
 
 
+@app.post("/expenses", status_code=201)
+async def add_expense(data: CreateExpense) -> Expense:  
+    if data.category_id not in categories:
+        raise HTTPException(422, detail="Такой категории нет")
+    expense = Expense(id=next(id_expense), created_at=datetime.now(), **data.model_dump())
+    expenses[expense.id] = expense
+    return expense
+
+
 @app.get("/health")
 async def alive():
     return {"status": "ok"}
+
