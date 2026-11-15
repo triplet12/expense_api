@@ -103,6 +103,12 @@ async def show_expenses() -> list[Expense]:
     return list(expenses.values())
 
 
+@app.get("/expenses/{expense_id}")
+async def show_expense_by_id(expense_id: int) -> Expense:
+    if expense_id not in expenses:
+        raise HTTPException(404, detail="Тарты с таким ID нет")
+    return expenses[expense_id]
+
 @app.get("/health")
 async def alive():
     return {"status": "ok"}
