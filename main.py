@@ -98,6 +98,11 @@ async def add_expense(data: CreateExpense) -> Expense:
     return expense
 
 
+@app.get('/expenses')
+async def show_expenses() -> list[Expense]:
+    return list(expenses.values())
+
+
 @app.get("/health")
 async def alive():
     return {"status": "ok"}
