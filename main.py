@@ -62,10 +62,10 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
     return category
 
 
-@app.delete("/categories/{id}", status_code=204)
-async def del_category(id: int) -> None:
-    is_category_exist(id)
-    del categories[id]
+@app.delete("/categories/{category_id}", status_code=204)
+async def del_category(category_id: int) -> None:
+    is_category_exist(category_id)
+    del categories[category_id]
 
 
 @app.get("/health")
