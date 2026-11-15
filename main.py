@@ -25,6 +25,11 @@ used_names = []
 ids = count(1)                        
 
 
+def is_category_exist(id: int):
+    if not categories.get(id):
+        raise HTTPException(404, 'Категории не существует') 
+
+
 @app.post("/categories", status_code=201)
 async def create_category(data: CategoryCreate) -> Category:
     if data.name.capitalize() in used_names:
@@ -43,16 +48,14 @@ async def list_categories() -> list[Category]:
 @app.get("/categories/{category_id}")
 async def get_category(category_id: int) -> Category:
     category = categories.get(category_id)
-    if not category:
-        raise HTTPException(404, detail="Категории не существует")
+    is_category_exist(category_id)
     return category
 
 
 @app.patch("/categories/{category_id}")
 async def rename_category(category_id: int, data: CategoryRename) -> Category:
-    if not categories.get(category_id):
-        raise HTTPException(404, 'Категории не существует')
-    elif data.name.capitalize() in used_names:
+    is_category_exist(category_id)
+    if data.name.capitalize() in used_names:
         raise HTTPException(409, 'Имя занято или использовано повторно')
     used_names.remove(categories[category_id].name)
     category = Category(id=category_id, name=data.name)
@@ -63,8 +66,7 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
 
 @app.delete("/categories/{id}", status_code=204)
 async def del_category(id: int) -> None:
-    if not categories.get(id):
-        raise HTTPException(404, "Категории не существует")
+    is_category_exist(id)
     used_names.remove(categories[id].name)
     del categories[id]
 
