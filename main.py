@@ -8,11 +8,11 @@ app = FastAPI()
 
 
 class CategoryCreate(BaseModel):
-    name: str = Annotated[str, StringConstraints(min_length=1, max_length=50)]
+    name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
 
 
 class CategoryRename(BaseModel):
-    name: str = Annotated[str, StringConstraints(min_length=1, max_length=50)]
+    name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
 
 
 class Category(BaseModel):         
