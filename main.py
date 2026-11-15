@@ -30,6 +30,7 @@ class Expense(BaseModel):
     category_id: int
     spent_at: date
     created_at: datetime
+    updated_at: datetime | None = None
 
 
 class CreateExpense(BaseModel):
@@ -37,6 +38,13 @@ class CreateExpense(BaseModel):
     description: str | None = None
     category_id: int
     spent_at: date
+
+
+class PatchExpense(BaseModel):
+    amount: Annotated[Decimal, Field(gt=0, decimal_places=2)] = None
+    description: str | None = None
+    category_id: int | None = None
+    spent_at: date | None = None
 
 
 categories: dict[int, Category] = {}  
@@ -110,11 +118,24 @@ async def show_expense_by_id(expense_id: int) -> Expense:
     return expenses[expense_id]
 
 
-@app.delete("/expenses/{expense_id}")
+@app.delete("/expenses/{expense_id}", status_code=204)
 async def del_expense(expense_id: int) -> None:
     if expense_id not in expenses:
         raise HTTPException(404, detail="Тарты с таким ID нет")
     del expenses[expense_id]
+
+
+@app.patch("/expenses/{expense_id}")
+async def update_expense_by_id(expense_id: int, expense: PatchExpense) -> Expense:
+    if expense_id not in expenses:
+        raise HTTPException(404, detail="Тарты с таким ID нет")
+    update_expense = expense.model_dump(exclude_unset=True)
+    updated_expense = expenses[expense_id].model_copy(update=update_expense)
+    if updated_expense.category_id not in expenses:
+        raise HTTPException(404, detail="Такой категории нет")
+    updated_expense.updated_at = datetime.now()
+    expenses[expense_id] = updated_expense
+    return updated_expense
 
 
 @app.get("/health")
