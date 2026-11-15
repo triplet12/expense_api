@@ -21,7 +21,6 @@ class Category(BaseModel):
 
 
 categories: dict[int, Category] = {}  
-used_names = []
 ids = count(1)                        
 
 
@@ -32,7 +31,8 @@ def is_category_exist(id: int):
 
 @app.post("/categories", status_code=201)
 async def create_category(data: CategoryCreate) -> Category:
-    if data.name.capitalize() in used_names:
+    name = data.name.capitalize()
+    if any(c.name == name for c in categories.values()):
         raise HTTPException(409, detail='Категория с таким именем уже есть')
     used_names.append(data.name.capitalize())
     category = Category(id=next(ids), name=data.name.capitalize())
@@ -55,7 +55,8 @@ async def get_category(category_id: int) -> Category:
 @app.patch("/categories/{category_id}")
 async def rename_category(category_id: int, data: CategoryRename) -> Category:
     is_category_exist(category_id)
-    if data.name.capitalize() in used_names:
+    name = data.name.capitalize()
+    if any(c.name == name for c in categories.values()):
         raise HTTPException(409, 'Имя занято или использовано повторно')
     used_names.remove(categories[category_id].name)
     category = Category(id=category_id, name=data.name)
