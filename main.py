@@ -57,7 +57,7 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
     name = data.name.capitalize()
     if any(c.name == name for c in categories.values()):
         raise HTTPException(409, 'Имя занято или использовано повторно')
-    category = Category(id=category_id, name=data.name)
+    category = Category(id=category_id, name=name)
     categories[category_id] = category
     return category
 
