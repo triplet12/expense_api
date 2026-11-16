@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from ..schemas import Category, CategoryCreate, CategoryRename
-from ..storage import categories, ids
+from ..storage import categories, ids, expenses
 
 
 router = APIRouter(prefix="/categories", tags=["categories"])
@@ -48,4 +48,6 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
 @router.delete("/{category_id}", status_code=204)
 async def del_category(category_id: int) -> None:
     is_category_exist(category_id)
+    if any(category_id == c.category_id for c in expenses.values()):
+        raise HTTPException(422, "У этой категории есть траты")
     del categories[category_id]
