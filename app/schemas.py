@@ -4,7 +4,6 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, StringConstraints, Field, model_validator
-from fastapi import Query
 
 
 class CategoryCreate(BaseModel):
@@ -54,7 +53,7 @@ class QueryFilters(BaseModel):
     @model_validator(mode='after')
     def check_date(self) -> Self:
         if (self.from_date and self.to_date) and (self.from_date > self.to_date):
-            raise ValueError('Неккоректная дата')
+            raise ValueError('Некорректная дата')
         return self
 
 

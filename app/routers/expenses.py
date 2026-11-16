@@ -25,8 +25,8 @@ async def add_expense(data: CreateExpense) -> Expense:
     return expense
 
 
-@router.get('') #  -> list[Expense]
-async def show_expenses(filter_query: Annotated[QueryFilters, Query()]) :
+@router.get('') 
+async def show_expenses(filter_query: Annotated[QueryFilters, Query()]) -> ExpensesPage:
     items = list(expenses.values())
     if filter_query.from_date is not None:
         items = [x for x in items if x.spent_at >= filter_query.from_date]

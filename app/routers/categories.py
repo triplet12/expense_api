@@ -49,5 +49,5 @@ async def rename_category(category_id: int, data: CategoryRename) -> Category:
 async def del_category(category_id: int) -> None:
     is_category_exist(category_id)
     if any(category_id == c.category_id for c in expenses.values()):
-        raise HTTPException(422, "У этой категории есть траты")
+        raise HTTPException(409, "У этой категории есть траты")
     del categories[category_id]
