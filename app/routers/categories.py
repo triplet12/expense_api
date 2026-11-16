@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from ..shemas import Category, CategoryCreate, CategoryRename
+from ..schemas import Category, CategoryCreate, CategoryRename
 from ..storage import categories, ids
 
 
@@ -12,7 +12,7 @@ def is_category_exist(id: int):
         raise HTTPException(404, 'Категории не существует') 
 
 
-@router.post("/", status_code=201)
+@router.post("", status_code=201)
 async def create_category(data: CategoryCreate) -> Category:
     name = data.name.capitalize()
     if any(c.name == name for c in categories.values()):
@@ -22,7 +22,7 @@ async def create_category(data: CategoryCreate) -> Category:
     return category
 
 
-@router.get("/")
+@router.get("")
 async def list_categories() -> list[Category]:
     return list(categories.values())
 

@@ -1,8 +1,8 @@
 '''Словари и счетчики для хранения информации'''
 from itertools import count
 
-from .shemas import Category
-from .shemas import Expense
+from .schemas import Category
+from .schemas import Expense
 
 
 categories: dict[int, Category] = {}  

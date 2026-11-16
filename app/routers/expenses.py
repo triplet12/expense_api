@@ -2,7 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException
 
-from ..shemas import Expense, PatchExpense, CreateExpense
+from ..schemas import Expense, PatchExpense, CreateExpense
 from ..storage import expenses, id_expense, categories
 
 
@@ -14,7 +14,7 @@ def is_expense_exist(id: int):
         raise HTTPException(404, detail="Траты с таким ID нет")
 
 
-@router.post("/", status_code=201)
+@router.post("", status_code=201)
 async def add_expense(data: CreateExpense) -> Expense:  
     if data.category_id not in categories:
         raise HTTPException(422, detail="Такой категории нет")
@@ -23,7 +23,7 @@ async def add_expense(data: CreateExpense) -> Expense:
     return expense
 
 
-@router.get('/')
+@router.get('')
 async def show_expenses() -> list[Expense]:
     return list(expenses.values())
 
