@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from ..schemas import Expense, PatchExpense, CreateExpense
+from ..schemas import QueryFilters, ExpensesPage
 from ..storage import expenses, id_expense, categories
 
 
@@ -23,9 +25,24 @@ async def add_expense(data: CreateExpense) -> Expense:
     return expense
 
 
-@router.get('')
-async def show_expenses() -> list[Expense]:
-    return list(expenses.values())
+@router.get('') #  -> list[Expense]
+async def show_expenses(filter_query: Annotated[QueryFilters, Query()]) :
+    items = list(expenses.values())
+    if filter_query.from_date is not None:
+        items = [x for x in items if x.spent_at >= filter_query.from_date]
+    if filter_query.to_date is not None:
+        items = [x for x in items if x.spent_at <= filter_query.to_date]
+    if filter_query.category_id is not None:
+        items = [x for x in items if x.category_id == filter_query.category_id]
+    items = sorted(items, key=lambda x: (x.spent_at, x.id), reverse=True)
+    total = len(items)
+    items = items[filter_query.offset:filter_query.offset + filter_query.limit]
+    return ExpensesPage(items=items,
+                        limit = filter_query.limit,
+                        total=total,
+                        offset=filter_query.offset,
+                        )
+
 
 
 @router.get("/{expense_id}")
