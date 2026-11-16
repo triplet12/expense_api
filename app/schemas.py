@@ -6,6 +6,11 @@ from decimal import Decimal
 from pydantic import BaseModel, StringConstraints, Field, model_validator
 
 
+def validate_date_range(from_date: date, to_date: date) -> None:
+    if from_date > to_date:
+        raise ValueError('Некорректная дата: from больше, чем to')
+
+
 class CategoryCreate(BaseModel):
     name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
 
@@ -52,8 +57,8 @@ class QueryFilters(BaseModel):
 
     @model_validator(mode='after')
     def check_date(self) -> Self:
-        if (self.from_date and self.to_date) and (self.from_date > self.to_date):
-            raise ValueError('Некорректная дата')
+        if self.from_date and self.to_date:
+            validate_date_range(self.from_date, self.to_date)
         return self
 
 
@@ -62,3 +67,27 @@ class ExpensesPage(BaseModel):
     total: int
     limit: int
     offset: int
+
+
+class ReportFilter(BaseModel):
+    from_date: date = Field(alias="from")
+    to_date: date = Field(alias="to")
+    @model_validator(mode='after')
+    def check_date(self) -> Self:
+        validate_date_range(self.from_date, self.to_date)
+        return self
+
+
+
+class ByCategory(BaseModel):
+    category_id: int
+    name: str
+    total: int
+    count: int
+
+
+class ReportPage(BaseModel):
+    from_date: date = Field(serialization_alias="from")
+    to_date: date = Field(serialization_alias="to")
+    count: int
+    by_category: list[ByCategory]
