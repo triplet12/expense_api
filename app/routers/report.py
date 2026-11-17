@@ -29,6 +29,6 @@ async def show_report(filter: Annotated[ReportFilter, Query()]) -> ReportPage:
             total_all += total
             count_all += count
 
-    by_category.sort(key=lambda x: x.total)
+    by_category.sort(key=lambda x: x.total, reverse=True)
     return ReportPage(from_date=filter.from_date, to_date=filter.to_date,
                       count=count_all, total=total_all, by_category=by_category)
