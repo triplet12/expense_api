@@ -64,7 +64,7 @@ class QueryFilters(BaseModel):
 
 class ExpensesPage(BaseModel):
     items: list[Expense]
-    total: Annotated[Decimal, Field(decimal_places=2)]
+    total: int
     limit: int
     offset: int
 
