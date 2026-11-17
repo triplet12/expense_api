@@ -64,7 +64,7 @@ class QueryFilters(BaseModel):
 
 class ExpensesPage(BaseModel):
     items: list[Expense]
-    total: int
+    total: Annotated[Decimal, Field(gt=0, decimal_places=2)]
     limit: int
     offset: int
 
@@ -82,13 +82,13 @@ class ReportFilter(BaseModel):
 class ByCategory(BaseModel):
     category_id: int
     name: str
-    total: int
+    total: Annotated[Decimal, Field(gt=0, decimal_places=2)]
     count: int
 
 
 class ReportPage(BaseModel):
     from_date: date = Field(serialization_alias="from")
     to_date: date = Field(serialization_alias="to")
-    total: int
+    total: Annotated[Decimal, Field(gt=0, decimal_places=2)]
     count: int
     by_category: list[ByCategory]
