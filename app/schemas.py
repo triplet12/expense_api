@@ -89,5 +89,6 @@ class ByCategory(BaseModel):
 class ReportPage(BaseModel):
     from_date: date = Field(serialization_alias="from")
     to_date: date = Field(serialization_alias="to")
+    total: int
     count: int
     by_category: list[ByCategory]
