@@ -14,3 +14,13 @@ def clean_state():
 @pytest.fixture()
 def client():
     return TestClient(app)
+
+
+@pytest.fixture()
+def created_categories(client):
+    created = []
+    for name in ["Еда", "Развлечения", "Вода"]:
+        r = client.post("/categories", json={"name": name})
+        assert r.status_code == 201
+        created.append(r.json())
+    return created
