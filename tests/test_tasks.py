@@ -1,7 +1,3 @@
-import pytest
-from .conftest import client, clean_state, created_categories
-
-
 def test_is_alive(client):
     response = client.get("/health")
     assert response.status_code == 200
@@ -10,6 +6,7 @@ def test_is_alive(client):
 def test_patch_categories_id(client, created_categories):
     id = created_categories[0]["id"]
     r = client.patch(f"/categories/{id}", json = {"name": 'Комуналка'})
+    assert r.status_code == 200
     assert r.json()["name"] == 'Комуналка'
 
 
@@ -32,6 +29,13 @@ def test_incorrect_categories_id(client, created_categories):
 
 
 def test_incorrect_patch_categories_id(client, created_categories):
+    id = created_categories[0]["id"]
     r = client.patch(f"/categories/{id}", json = {})
     assert r.status_code == 422
+
+
+def test_del_categories_id(client, created_categories):
+    id = created_categories[0]["id"]
+    response = client.delete(f"/categories/{id}")
+    assert response.status_code == 204
 
