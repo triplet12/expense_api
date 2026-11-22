@@ -7,16 +7,10 @@ def test_is_alive(client):
     assert response.status_code == 200
 
 
-def test_patch_categories_id(client):
-    client.post("/categories", json={"name": 'Развлечения'})
-    r = client.patch("/categories/1", json = {"name": 'Вода'})
-    assert r.json()["name"] == 'Вода'
-
-
-def test_incorrect_patch_categories_id(client):
-    client.post("/categories", json={"name": 'Развлечения'})
-    r = client.patch("/categories/1", json = {})
-    assert r.status_code == 422
+def test_patch_categories_id(client, created_categories):
+    id = created_categories[0]["id"]
+    r = client.patch(f"/categories/{id}", json = {"name": 'Комуналка'})
+    assert r.json()["name"] == 'Комуналка'
 
 
 def test_get_categories(client, created_categories):
@@ -32,6 +26,12 @@ def test_incorrect_post_categories(client):
 
 
 def test_incorrect_categories_id(client, created_categories):
-    response = client.get("/categories/100")
+    id = created_categories[2]["id"] + 1
+    response = client.get(f"/categories/{id}")
     assert response.status_code == 404
+
+
+def test_incorrect_patch_categories_id(client, created_categories):
+    r = client.patch(f"/categories/{id}", json = {})
+    assert r.status_code == 422
 
