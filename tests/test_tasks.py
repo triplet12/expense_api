@@ -19,6 +19,6 @@ def test_incorrect_post_categories(client):
     assert response.status_code == 422
 
 
-
-
-
+def test_incorrect_categories_id(client, created_categories):
+    response = client.get("/categories/100")
+    assert response.status_code == 404
